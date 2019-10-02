@@ -11,8 +11,6 @@ using Core.Database.Enums;
 using Core.Database.Models;
 using Core.Database.Payloads;
 using Core.Database.Tables;
-using Core.Relationships.Implementation.Commands;
-using Core.Relationships.Interfaces.Services;
 using MediatR;
 using Newtonsoft.Json;
 
@@ -22,13 +20,11 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
     {
         private IMapper _mapper;
         private IBeawreContext _beawreContext;
-        private IRelationshipService _relationshipService;
 
-        public CreateTreatmentCommandHandler(IMapper mapper, IBeawreContext beawreContext, IRelationshipService relationshipService)
+        public CreateTreatmentCommandHandler(IMapper mapper, IBeawreContext beawreContext)
         {
             _mapper = mapper;
             _beawreContext = beawreContext;
-            _relationshipService = relationshipService;
         }
 
         public Task<Treatment> Handle(CreateTreatmentCommand request, CancellationToken cancellationToken)
@@ -52,7 +48,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
                 _beawreContext.SaveChanges();
             }
 
-            _relationshipService.Create(new CreateRelationshipCommand()
+            _beawreContext.Relationship.Add(new Relationship()
             {
                 FromType = ObjectType.Treatment,
                 FromId = treatment.Id,
