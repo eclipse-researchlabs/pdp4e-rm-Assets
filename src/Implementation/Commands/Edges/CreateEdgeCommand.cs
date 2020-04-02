@@ -7,6 +7,7 @@ namespace Core.Assets.Implementation.Commands.Edges
     public class CreateEdgeCommand
     {
         public string Name { get; set; }
+        public Guid? ContainerRootId { get; set; }
 
         public Guid Asset1Guid { get; set; }
         public int Asset1Anchor { get; set; }

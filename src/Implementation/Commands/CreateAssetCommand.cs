@@ -10,5 +10,6 @@ namespace Core.Assets.Implementation.Commands
     {
         public AssetPayloadModel PayloadData { get; set; }
         public List<Guid> Assets { get; set; }
+        public Guid? ContainerRootId { get; set; }
     }
 }
