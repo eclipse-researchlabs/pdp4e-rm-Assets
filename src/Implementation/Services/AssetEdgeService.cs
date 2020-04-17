@@ -28,5 +28,14 @@ namespace Core.Assets.Implementation.Services
             edge.Payload = JsonConvert.SerializeObject(payload);
             _beawreContext.SaveChanges();
         }
+
+        public bool Delete(Guid id)
+        {
+            var item = _beawreContext.Relationship.FirstOrDefault(x => x.Id == id);
+            if (item == null) return false;
+            item.IsDeleted = true;
+            _beawreContext.SaveChanges();
+            return true;
+        }
     }
 }

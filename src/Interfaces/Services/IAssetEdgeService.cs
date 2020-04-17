@@ -8,5 +8,6 @@ namespace Core.Assets.Interfaces.Services
     public interface IAssetEdgeService
     {
         void Update(ChangeEdgeLabelCommand command);
+        bool Delete(Guid id);
     }
 }
