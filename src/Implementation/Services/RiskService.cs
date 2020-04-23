@@ -17,7 +17,9 @@ namespace Core.Assets.Implementation.Services
         {
             _mediator = mediator;
         }
+
         public async Task<Risk> Create(CreateRiskCommand command) => await _mediator.Send(command);
+        public bool Update(UpdateRiskCommand command) => _mediator.Send(command).Result;
 
     }
 }

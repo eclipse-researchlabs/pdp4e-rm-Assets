@@ -10,5 +10,7 @@ namespace Core.Assets.Interfaces.Services
     public interface ITreatmentService
     {
         Task<Treatment> Create(CreateTreatmentCommand command);
+        Guid Update(UpdateTreatmentCommand command);
+        bool Delete(Guid id);
     }
 }

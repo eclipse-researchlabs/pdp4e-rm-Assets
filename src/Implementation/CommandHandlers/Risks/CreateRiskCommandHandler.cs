@@ -51,9 +51,9 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
             _beawreContext.Relationship.Add(new Relationship()
             {
                 FromType = ObjectType.Risk, 
-                FromId = risk.Id, 
+                FromId = risk.RootId, 
                 ToType = ObjectType.RiskPayload, 
-                ToId = riskPayload.Id
+                ToId = riskPayload.RootId
             });
 
             return Task.FromResult(risk);

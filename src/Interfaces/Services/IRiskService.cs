@@ -10,5 +10,6 @@ namespace Core.Assets.Interfaces.Services
     public interface IRiskService
     {
         Task<Risk> Create(CreateRiskCommand command);
+        bool Update(UpdateRiskCommand command);
     }
 }
