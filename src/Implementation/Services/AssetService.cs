@@ -9,6 +9,8 @@ using Core.Assets.Interfaces.Services;
 using Core.Database;
 using Core.Database.Tables;
 using MediatR;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Core.Assets.Implementation.Services
 {
@@ -30,6 +32,16 @@ namespace Core.Assets.Implementation.Services
         public void ChangeName(ChangeAssetNameCommand command)
         {
             _beawreContext.Assets.FirstOrDefault(x => x.Id == command.AssetId).Name = command.Name;
+            _beawreContext.SaveChanges();
+        }
+
+        public void UpdateDfdQuestionaire(UpdateDfdQuestionaireCommand command)
+        {
+            var item = _beawreContext.Assets.FirstOrDefault(x => x.Id == command.AssetId);
+            var payload = JObject.Parse(item.Payload ?? "{}");
+            if(payload.ContainsKey("DfdQuestionaire")) payload.SelectToken("DfdQuestionaire").Replace(JArray.Parse(command.Payload));
+            else payload.Add(new JProperty("DfdQuestionaire", JArray.Parse(command.Payload)));
+            item.Payload = JsonConvert.SerializeObject(payload);
             _beawreContext.SaveChanges();
         }
 

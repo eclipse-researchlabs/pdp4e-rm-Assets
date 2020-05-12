@@ -14,5 +14,6 @@ namespace Core.Assets.Interfaces.Services
         Task<bool> MovePosition(UpdateAssetPositionCommand command);
         void ChangeName(ChangeAssetNameCommand command);
         void Delete(Guid id);
+        void UpdateDfdQuestionaire(UpdateDfdQuestionaireCommand command);
     }
 }
