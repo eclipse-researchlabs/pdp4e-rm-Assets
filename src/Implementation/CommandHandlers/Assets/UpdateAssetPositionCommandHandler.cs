@@ -23,13 +23,16 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
 
         public Task<bool> Handle(UpdateAssetPositionCommand request, CancellationToken cancellationToken)
         {
-            var entity = _beawreContext.Assets.FirstOrDefault(x => x.Id == request.AssetId);
+            var relationship =
+                _beawreContext.Relationship.FirstOrDefault(x =>
+                    x.FromId == request.ContainerId && x.ToId == request.AssetId);
 
-            var payloadData = JsonConvert.DeserializeObject<AssetPayloadModel>(entity.Payload);
-            payloadData.X = request.X;
-            payloadData.Y = request.Y;
+            var payload = JsonConvert.DeserializeObject<AssetPayloadModel>(relationship?.Payload ?? "{}");
 
-            entity.Payload = JsonConvert.SerializeObject(payloadData);
+            payload.X = request.X;
+            payload.Y = request.Y;
+
+            relationship.Payload = JsonConvert.SerializeObject(payload);
             _beawreContext.SaveChanges();
 
             return Task.FromResult(true);
