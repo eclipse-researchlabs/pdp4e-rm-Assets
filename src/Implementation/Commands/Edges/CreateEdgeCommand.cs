@@ -15,5 +15,7 @@ namespace Core.Assets.Implementation.Commands.Edges
         public Guid Asset2Guid { get; set; }
         public int Asset2Anchor { get; set; }
 
+        public Guid CreateByUserId { get; set; }
+
     }
 }
