@@ -35,7 +35,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
                     !x.IsDeleted && x.FromType == ObjectType.Risk && x.ToType == ObjectType.RiskPayload &&
                     x.FromId == item.RootId).ToId;
 
-            var riskPayload = _beawreContext.RiskPayload.FirstOrDefault(x => x.Id == riskPayloadId && !x.IsDeleted);
+            var riskPayload = _beawreContext.RiskPayload.Where(x => x.RootId == riskPayloadId && !x.IsDeleted).OrderByDescending(x => x.Version).FirstOrDefault();
             riskPayload.Id = Guid.NewGuid();
             riskPayload.Payload = payload;
             riskPayload.Version += 1;
