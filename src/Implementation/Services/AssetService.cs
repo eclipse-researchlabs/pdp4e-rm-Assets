@@ -58,6 +58,8 @@ namespace Core.Assets.Implementation.Services
             _beawreContext.SaveChanges();
         }
 
+        public bool UpdateIndex(UpdateAssetIndexCommand command) => _mediator.Send(command).Result;
+
         public void Delete(Guid id)
         {
             _beawreContext.Assets.FirstOrDefault(x => x.Id == id).IsDeleted = true;

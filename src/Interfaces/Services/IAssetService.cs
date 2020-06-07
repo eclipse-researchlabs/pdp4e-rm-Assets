@@ -15,5 +15,6 @@ namespace Core.Assets.Interfaces.Services
         void ChangeName(ChangeAssetNameCommand command);
         void Delete(Guid id);
         void UpdateDfdQuestionaire(UpdateDfdQuestionaireCommand command);
+        bool UpdateIndex(UpdateAssetIndexCommand command);
     }
 }
