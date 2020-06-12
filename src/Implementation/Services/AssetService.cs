@@ -60,6 +60,8 @@ namespace Core.Assets.Implementation.Services
 
         public bool UpdateIndex(UpdateAssetIndexCommand command) => _mediator.Send(command).Result;
 
+        public bool UpdateDfdType(UpdateAssetDfdTypeCommand command) => _mediator.Send(command).Result;
+
         public void Delete(Guid id)
         {
             _beawreContext.Assets.FirstOrDefault(x => x.Id == id).IsDeleted = true;
