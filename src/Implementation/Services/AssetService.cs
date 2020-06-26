@@ -64,7 +64,9 @@ namespace Core.Assets.Implementation.Services
 
         public void Delete(Guid id)
         {
-            _beawreContext.Assets.FirstOrDefault(x => x.Id == id).IsDeleted = true;
+            var asset = _beawreContext.Assets.FirstOrDefault(x => x.Id == id);
+            if (asset == null) return;
+            asset.IsDeleted = true;
             foreach (var relation in _beawreContext.Relationship.Where(x => x.FromId == id || x.ToId == id))
                 relation.IsDeleted = true;
             _beawreContext.SaveChanges();

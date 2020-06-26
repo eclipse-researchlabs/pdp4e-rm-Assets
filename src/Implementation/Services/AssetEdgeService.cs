@@ -22,7 +22,7 @@ namespace Core.Assets.Implementation.Services
         public void Update(ChangeEdgeLabelCommand command)
         {
             var edge = _beawreContext.Relationship.FirstOrDefault(x => x.Id == command.EdgeId);
-            var payload = JsonConvert.DeserializeObject<AssetEdgePayloadModel>(edge.Payload);
+            var payload = JsonConvert.DeserializeObject<AssetEdgePayloadModel>(edge.Payload ?? "{}");
             payload.Name = command.Label;
             payload.Shape = command.Shape;
             edge.Payload = JsonConvert.SerializeObject(payload);
