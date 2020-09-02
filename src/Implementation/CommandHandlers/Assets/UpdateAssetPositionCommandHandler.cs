@@ -32,6 +32,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
             payload.X = request.X;
             payload.Y = request.Y;
 
+            if (relationship == null) return Task.FromResult(false);
             relationship.Payload = JsonConvert.SerializeObject(payload);
             _beawreContext.SaveChanges();
 
