@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Core.Assets.Implementation.CommandHandlers.Treatments
 {
-    public class CreateTreatmentCommandHandler : IRequestHandler<CreateTreatmentCommand, Treatment>
+    public class CreateTreatmentCommandHandler : IRequestHandler<CreateTreatmentCommand, TreatmentModel>
     {
         private IMapper _mapper;
         private IBeawreContext _beawreContext;
@@ -27,11 +27,9 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             _beawreContext = beawreContext;
         }
 
-        public Task<Treatment> Handle(CreateTreatmentCommand request, CancellationToken cancellationToken)
+        public Task<TreatmentModel> Handle(CreateTreatmentCommand request, CancellationToken cancellationToken)
         {
-            //var entity = _mapper.Map<Treatment>(request);
-
-            var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(new TreatmentPayloadModel() { }) };
+            var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(new TreatmentPayloadModel() { Status = "pending-approval" }) };
             _beawreContext.TreatmentPayload.Add(treatmentPayload);
             _beawreContext.SaveChanges();
 
@@ -43,10 +41,22 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             var treatment = treatments.Where(x => x.ClosedDescriptionProbability <= 7).OrderByDescending(x => x.ClosedDescriptionProbability).FirstOrDefault();
             if (treatment == null)
             {
-                treatment = new TreatmentModel(){ Type = request.Type, Description = request.Description, Name = request.Name };
+                treatment = new TreatmentModel() { Type = request.Type, Description = request.Description, Name = request.Name };
                 _beawreContext.Treatment.Add(treatment);
                 _beawreContext.SaveChanges();
             }
+
+            var treatmentModel = _mapper.Map<TreatmentModel>(treatment);
+            treatmentModel.Payload = treatmentPayload;
+
+            if (request.RiskId.HasValue)
+                _beawreContext.Relationship.Add(new Relationship()
+                {
+                    FromType = ObjectType.Risk,
+                    FromId = request.RiskId.Value,
+                    ToType = ObjectType.TreatmentPayload,
+                    ToId = treatmentPayload.Id
+                });
 
             _beawreContext.Relationship.Add(new Relationship()
             {
@@ -56,7 +66,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
                 ToId = treatmentPayload.Id
             });
             _beawreContext.SaveChanges();
-            return Task.FromResult(_mapper.Map<Treatment>(treatment));
+            return Task.FromResult(treatmentModel);
         }
     }
 }

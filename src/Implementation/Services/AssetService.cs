@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Assets.Implementation.Commands;
@@ -24,6 +25,9 @@ namespace Core.Assets.Implementation.Services
             _mediator = mediator;
             _beawreContext = beawreContext;
         }
+
+        public Asset GetSingle(Expression<Func<Asset, bool>> func) =>
+            _beawreContext.Assets.FirstOrDefault(func);
 
         public async Task<Asset> Create(CreateAssetCommand command) => await _mediator.Send(command);
 

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Assets.Implementation.Commands.Treatments;
 using Core.Assets.Interfaces.Services;
 using Core.Database;
+using Core.Database.Models;
 using Core.Database.Tables;
 using MediatR;
 
@@ -22,7 +23,7 @@ namespace Core.Assets.Implementation.Services
             _beawreContext = beawreContext;
         }
 
-        public async Task<Treatment> Create(CreateTreatmentCommand command) => await _mediator.Send(command);
+        public async Task<TreatmentModel> Create(CreateTreatmentCommand command) => await _mediator.Send(command);
         public Guid Update(UpdateTreatmentCommand command) => _mediator.Send(command).Result;
 
         public bool Delete(Guid id)

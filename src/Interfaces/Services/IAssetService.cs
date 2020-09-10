@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Assets.Implementation.Commands;
@@ -17,5 +18,6 @@ namespace Core.Assets.Interfaces.Services
         void UpdateDfdQuestionaire(UpdateDfdQuestionaireCommand command);
         bool UpdateIndex(UpdateAssetIndexCommand command);
         bool UpdateDfdType(UpdateAssetDfdTypeCommand command);
+        Asset GetSingle(Expression<Func<Asset, bool>> func);
     }
 }
