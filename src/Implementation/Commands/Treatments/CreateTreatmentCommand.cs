@@ -11,5 +11,7 @@ namespace Core.Assets.Implementation.Commands.Treatments
     {
         public Guid AssetId { get; set; }
         public Guid? RiskId { get; set; }
+
+        public string Payload { get; set; }
     }
 }

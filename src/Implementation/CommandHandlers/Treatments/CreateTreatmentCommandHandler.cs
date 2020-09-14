@@ -13,6 +13,7 @@ using Core.Database.Payloads;
 using Core.Database.Tables;
 using MediatR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Core.Assets.Implementation.CommandHandlers.Treatments
 {
@@ -29,7 +30,10 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
 
         public Task<TreatmentModel> Handle(CreateTreatmentCommand request, CancellationToken cancellationToken)
         {
-            var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(new TreatmentPayloadModel() { Status = "pending-approval" }) };
+            var requestPayload = JObject.Parse(request.Payload ?? "{}");
+            requestPayload.Add(new JProperty("Status", "pending-approval"));
+
+            var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(requestPayload) };
             _beawreContext.TreatmentPayload.Add(treatmentPayload);
             _beawreContext.SaveChanges();
 
@@ -38,7 +42,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             foreach (var treatmentItem in treatments)
                 treatmentItem.ClosedDescriptionProbability = lev.DistanceFrom(treatmentItem.Description);
 
-            var treatment = treatments.Where(x => x.ClosedDescriptionProbability <= 7).OrderByDescending(x => x.ClosedDescriptionProbability).FirstOrDefault();
+            var treatment = treatments.Where(x => x.ClosedDescriptionProbability <= 7 && x.Type?.ToLower() == request.Type.ToLower()).OrderByDescending(x => x.ClosedDescriptionProbability).FirstOrDefault();
             if (treatment == null)
             {
                 treatment = new TreatmentModel() { Type = request.Type, Description = request.Description, Name = request.Name };
