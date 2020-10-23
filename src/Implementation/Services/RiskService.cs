@@ -19,7 +19,11 @@ namespace Core.Assets.Implementation.Services
         }
 
         public async Task<Risk> Create(CreateRiskCommand command) => await _mediator.Send(command);
-        public bool Update(UpdateRiskCommand command) => _mediator.Send(command).Result;
+
+        public bool Update(UpdateRiskCommand command)
+            => _mediator.Send(command).Result;
+        public bool UpdateStatus(UpdateRiskStatusCommand command)
+            => _mediator.Send(command).Result;
 
     }
 }

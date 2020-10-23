@@ -11,5 +11,6 @@ namespace Core.Assets.Interfaces.Services
     {
         Task<Risk> Create(CreateRiskCommand command);
         bool Update(UpdateRiskCommand command);
+        bool UpdateStatus(UpdateRiskStatusCommand command);
     }
 }
