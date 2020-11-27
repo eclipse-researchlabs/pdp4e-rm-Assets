@@ -48,6 +48,10 @@ namespace Core.Assets.Implementation.Services
                 if (payload.ContainsKey("DfdQuestionaire"))
                     payload.SelectToken("DfdQuestionaire").Replace(JArray.Parse(command.Payload));
                 else payload.Add(new JProperty("DfdQuestionaire", JArray.Parse(command.Payload)));
+
+                if (payload.ContainsKey("GeneratingVRT")) payload.SelectToken("GeneratingVRT").Replace(2);
+                else payload.Add(new JProperty("GeneratingVRT", 2));
+
                 item.Payload = JsonConvert.SerializeObject(payload);
             }
             else
@@ -57,6 +61,10 @@ namespace Core.Assets.Implementation.Services
                 if (payload.ContainsKey("DfdQuestionaire"))
                     payload.SelectToken("DfdQuestionaire").Replace(JArray.Parse(command.Payload));
                 else payload.Add(new JProperty("DfdQuestionaire", JArray.Parse(command.Payload)));
+
+                if (payload.ContainsKey("GeneratingVRT")) payload.SelectToken("GeneratingVRT").Replace(2);
+                else payload.Add(new JProperty("GeneratingVRT", 2));
+
                 item.Payload = JsonConvert.SerializeObject(payload);
             }
             _beawreContext.SaveChanges();
