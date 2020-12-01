@@ -33,6 +33,13 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             var requestPayload = JObject.Parse(request.Payload ?? "{}");
             requestPayload.Add(new JProperty("Status", "pending-approval"));
 
+            if (requestPayload.ContainsKey("database"))
+            {
+                var query = requestPayload.SelectToken("database").SelectToken("quert").Value<string>();
+                if (query.Contains("UPDATE") || query.Contains("TRUNCATE") || query.Contains("DELETE") || query.Contains("ALTER") || query.Contains("CREATE") || query.Contains("INSERT") || query.Contains("DROP"))
+                    throw new Exception("FORBIDDEN_KEY");
+            }
+
             var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(requestPayload) };
             _beawreContext.TreatmentPayload.Add(treatmentPayload);
             _beawreContext.SaveChanges();
