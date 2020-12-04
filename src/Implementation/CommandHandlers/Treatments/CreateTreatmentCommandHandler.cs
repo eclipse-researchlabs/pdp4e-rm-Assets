@@ -20,12 +20,12 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
     public class CreateTreatmentCommandHandler : IRequestHandler<CreateTreatmentCommand, TreatmentModel>
     {
         private IMapper _mapper;
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public CreateTreatmentCommandHandler(IMapper mapper, IBeawreContext beawreContext)
+        public CreateTreatmentCommandHandler(IMapper mapper, IDatabaseContext databaseContext)
         {
             _mapper = mapper;
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Task<TreatmentModel> Handle(CreateTreatmentCommand request, CancellationToken cancellationToken)
@@ -41,10 +41,10 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             }
 
             var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(requestPayload) };
-            _beawreContext.TreatmentPayload.Add(treatmentPayload);
-            _beawreContext.SaveChanges();
+            _databaseContext.TreatmentPayload.Add(treatmentPayload);
+            _databaseContext.SaveChanges();
 
-            var treatments = _mapper.Map<List<TreatmentModel>>(_beawreContext.Treatment.ToList());
+            var treatments = _mapper.Map<List<TreatmentModel>>(_databaseContext.Treatment.ToList());
             Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein(request.Description);
             foreach (var treatmentItem in treatments)
                 treatmentItem.ClosedDescriptionProbability = lev.DistanceFrom(treatmentItem.Description);
@@ -53,15 +53,15 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             if (treatment == null)
             {
                 treatment = new TreatmentModel() { Type = request.Type, Description = request.Description, Name = request.Name };
-                _beawreContext.Treatment.Add(treatment);
-                _beawreContext.SaveChanges();
+                _databaseContext.Treatment.Add(treatment);
+                _databaseContext.SaveChanges();
             }
 
             var treatmentModel = _mapper.Map<TreatmentModel>(treatment);
             treatmentModel.Payload = treatmentPayload;
 
             if (request.RiskId.HasValue)
-                _beawreContext.Relationship.Add(new Relationship()
+                _databaseContext.Relationship.Add(new Relationship()
                 {
                     FromType = ObjectType.Risk,
                     FromId = request.RiskId.Value,
@@ -69,14 +69,14 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
                     ToId = treatmentPayload.Id
                 });
 
-            _beawreContext.Relationship.Add(new Relationship()
+            _databaseContext.Relationship.Add(new Relationship()
             {
                 FromType = ObjectType.Treatment,
                 FromId = treatment.Id,
                 ToType = ObjectType.TreatmentPayload,
                 ToId = treatmentPayload.Id
             });
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
             return Task.FromResult(treatmentModel);
         }
     }

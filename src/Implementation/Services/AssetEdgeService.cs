@@ -12,29 +12,29 @@ namespace Core.Assets.Implementation.Services
 {
     public class AssetEdgeService : IAssetEdgeService
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public AssetEdgeService(IBeawreContext beawreContext)
+        public AssetEdgeService(IDatabaseContext databaseContext)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public void Update(ChangeEdgeLabelCommand command)
         {
-            var edge = _beawreContext.Relationship.FirstOrDefault(x => x.Id == command.EdgeId);
+            var edge = _databaseContext.Relationship.FirstOrDefault(x => x.Id == command.EdgeId);
             var payload = JsonConvert.DeserializeObject<AssetEdgePayloadModel>(edge.Payload ?? "{}");
             payload.Name = command.Label;
             payload.Shape = command.Shape;
             edge.Payload = JsonConvert.SerializeObject(payload);
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
         }
 
         public bool Delete(Guid id)
         {
-            var item = _beawreContext.Relationship.FirstOrDefault(x => x.Id == id);
+            var item = _databaseContext.Relationship.FirstOrDefault(x => x.Id == id);
             if (item == null) return false;
             item.IsDeleted = true;
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
             return true;
         }
     }

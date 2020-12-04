@@ -18,20 +18,20 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
 {
     public class UpdateTreatmentCommandHandler : IRequestHandler<UpdateTreatmentCommand, Guid>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
         private IMapper _mapper;
 
-        public UpdateTreatmentCommandHandler(IBeawreContext beawreContext, IMapper mapper)
+        public UpdateTreatmentCommandHandler(IDatabaseContext databaseContext, IMapper mapper)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
             _mapper = mapper;
         }
 
         public Task<Guid> Handle(UpdateTreatmentCommand request, CancellationToken cancellationToken)
         {
-            var currentTreatment = _beawreContext.Treatment.FirstOrDefault(x => x.Id == request.Id);
+            var currentTreatment = _databaseContext.Treatment.FirstOrDefault(x => x.Id == request.Id);
 
-            var treatments = _mapper.Map<List<TreatmentModel>>(_beawreContext.Treatment.ToList());
+            var treatments = _mapper.Map<List<TreatmentModel>>(_databaseContext.Treatment.ToList());
             Fastenshtein.Levenshtein lev = new Fastenshtein.Levenshtein(request.Description);
             foreach (var treatmentItem in treatments)
                 treatmentItem.ClosedDescriptionProbability = lev.DistanceFrom(treatmentItem.Description);
@@ -40,18 +40,18 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             if (treatment == null)
             {
                 treatment = new TreatmentModel() { Type = request.Type, Description = request.Description, Name = request.Name, };
-                _beawreContext.Treatment.Add(treatment);
-                _beawreContext.SaveChanges();
+                _databaseContext.Treatment.Add(treatment);
+                _databaseContext.SaveChanges();
             }
             //else
-            //    _beawreContext.Relationship.Add(new Relationship()
+            //    _databaseContext.Relationship.Add(new Relationship()
             //    {
             //        FromType = ObjectType.Treatment,
             //        FromId = treatment.Id,
             //        ToType = ObjectType.TreatmentPayload,
             //        ToId = treatmentPayload.Id
             //    });
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
             return Task.FromResult(treatment.Id);
         }
     }

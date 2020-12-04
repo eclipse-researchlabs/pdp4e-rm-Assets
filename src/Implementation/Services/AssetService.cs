@@ -18,16 +18,16 @@ namespace Core.Assets.Implementation.Services
     public class AssetService : IAssetService
     {
         private IMediator _mediator;
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public AssetService(IMediator mediator, IBeawreContext beawreContext)
+        public AssetService(IMediator mediator, IDatabaseContext databaseContext)
         {
             _mediator = mediator;
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Asset GetSingle(Expression<Func<Asset, bool>> func) =>
-            _beawreContext.Assets.FirstOrDefault(func);
+            _databaseContext.Assets.FirstOrDefault(func);
 
         public async Task<Asset> Create(CreateAssetCommand command) => await _mediator.Send(command);
 
@@ -35,15 +35,15 @@ namespace Core.Assets.Implementation.Services
 
         public void ChangeName(ChangeAssetNameCommand command)
         {
-            _beawreContext.Assets.FirstOrDefault(x => x.Id == command.AssetId).Name = command.Name;
-            _beawreContext.SaveChanges();
+            _databaseContext.Assets.FirstOrDefault(x => x.Id == command.AssetId).Name = command.Name;
+            _databaseContext.SaveChanges();
         }
 
         public void UpdateDfdQuestionaire(UpdateDfdQuestionaireCommand command)
         {
             if (command.AssetId.HasValue)
             {
-                var item = _beawreContext.Assets.FirstOrDefault(x => x.Id == command.AssetId);
+                var item = _databaseContext.Assets.FirstOrDefault(x => x.Id == command.AssetId);
                 var payload = JObject.Parse(item.Payload ?? "{}");
                 if (payload.ContainsKey("DfdQuestionaire"))
                     payload.SelectToken("DfdQuestionaire").Replace(JArray.Parse(command.Payload));
@@ -56,7 +56,7 @@ namespace Core.Assets.Implementation.Services
             }
             else
             {
-                var item = _beawreContext.Relationship.FirstOrDefault(x => x.Id == command.EdgeId);
+                var item = _databaseContext.Relationship.FirstOrDefault(x => x.Id == command.EdgeId);
                 var payload = JObject.Parse(item.Payload ?? "{}");
                 if (payload.ContainsKey("DfdQuestionaire"))
                     payload.SelectToken("DfdQuestionaire").Replace(JArray.Parse(command.Payload));
@@ -67,7 +67,7 @@ namespace Core.Assets.Implementation.Services
 
                 item.Payload = JsonConvert.SerializeObject(payload);
             }
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
         }
 
         public bool UpdateIndex(UpdateAssetIndexCommand command) => _mediator.Send(command).Result;
@@ -76,12 +76,12 @@ namespace Core.Assets.Implementation.Services
 
         public void Delete(Guid id)
         {
-            var asset = _beawreContext.Assets.FirstOrDefault(x => x.Id == id);
+            var asset = _databaseContext.Assets.FirstOrDefault(x => x.Id == id);
             if (asset == null) return;
             asset.IsDeleted = true;
-            foreach (var relation in _beawreContext.Relationship.Where(x => x.FromId == id || x.ToId == id))
+            foreach (var relation in _databaseContext.Relationship.Where(x => x.FromId == id || x.ToId == id))
                 relation.IsDeleted = true;
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
         }
     }
 }

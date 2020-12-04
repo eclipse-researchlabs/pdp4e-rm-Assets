@@ -15,12 +15,12 @@ namespace Core.Assets.Implementation.Services
     public class TreatmentService : ITreatmentService
     {
         private IMediator _mediator;
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public TreatmentService(IMediator mediator, IBeawreContext beawreContext)
+        public TreatmentService(IMediator mediator, IDatabaseContext databaseContext)
         {
             _mediator = mediator;
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public async Task<TreatmentModel> Create(CreateTreatmentCommand command) => await _mediator.Send(command);
@@ -28,8 +28,8 @@ namespace Core.Assets.Implementation.Services
 
         public bool Delete(Guid id)
         {
-            _beawreContext.Treatment.FirstOrDefault(x => x.Id == id).IsDeleted = true;
-            _beawreContext.SaveChanges();
+            _databaseContext.Treatment.FirstOrDefault(x => x.Id == id).IsDeleted = true;
+            _databaseContext.SaveChanges();
             return true;
         }
     }

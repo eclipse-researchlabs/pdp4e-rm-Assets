@@ -16,12 +16,12 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
 {
     public class UpdateRiskCommandHandler : IRequestHandler<UpdateRiskCommand, bool>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
         private IMapper _mapper;
 
-        public UpdateRiskCommandHandler(IBeawreContext beawreContext, IMapper mapper)
+        public UpdateRiskCommandHandler(IDatabaseContext databaseContext, IMapper mapper)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
             _mapper = mapper;
         }
 
@@ -29,26 +29,26 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
         {
             var payload = JsonConvert.SerializeObject(request.PayloadData);
 
-            var item = _beawreContext.Risk.FirstOrDefault(x => x.Id == request.Id && !x.IsDeleted);
-            var riskPayloadId = _beawreContext.Relationship.OrderByDescending(x => x.CreatedDateTime)
+            var item = _databaseContext.Risk.FirstOrDefault(x => x.Id == request.Id && !x.IsDeleted);
+            var riskPayloadId = _databaseContext.Relationship.OrderByDescending(x => x.CreatedDateTime)
                 .FirstOrDefault(x =>
                     !x.IsDeleted && x.FromType == ObjectType.Risk && x.ToType == ObjectType.RiskPayload &&
                     x.FromId == item.RootId).ToId;
 
-            var riskPayload = _beawreContext.RiskPayload.Where(x => x.RootId == riskPayloadId && !x.IsDeleted).OrderByDescending(x => x.Version).FirstOrDefault();
+            var riskPayload = _databaseContext.RiskPayload.Where(x => x.RootId == riskPayloadId && !x.IsDeleted).OrderByDescending(x => x.Version).FirstOrDefault();
             riskPayload.Id = Guid.NewGuid();
             riskPayload.Payload = payload;
             riskPayload.Version += 1;
             riskPayload.CreatedDateTime = DateTime.Now;
-            _beawreContext.RiskPayload.Add(riskPayload);
+            _databaseContext.RiskPayload.Add(riskPayload);
 
             item.Description = request.Description;
             item.Name = request.Name;
             item.Version += 1;
             item.CreatedDateTime = DateTime.Now;
-            _beawreContext.Risk.Add(item);
+            _databaseContext.Risk.Add(item);
 
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(true);
         }

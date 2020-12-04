@@ -14,12 +14,12 @@ namespace Core.Assets.Implementation.CommandHandlers
 {
     public class CreateAssetCommandHandler : IRequestHandler<CreateAssetCommand, Asset>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
         private IMapper _mapper;
 
-        public CreateAssetCommandHandler(IBeawreContext beawreContext, IMapper mapper)
+        public CreateAssetCommandHandler(IDatabaseContext databaseContext, IMapper mapper)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
             _mapper = mapper;
         }
 
@@ -29,8 +29,8 @@ namespace Core.Assets.Implementation.CommandHandlers
 
             entity.Payload = JsonConvert.SerializeObject(request.PayloadData);
 
-            _beawreContext.Assets.Add(entity);
-            _beawreContext.SaveChanges();
+            _databaseContext.Assets.Add(entity);
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(entity);
         }

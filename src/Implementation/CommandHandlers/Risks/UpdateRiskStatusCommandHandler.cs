@@ -15,19 +15,19 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
 {
     public class UpdateRiskStatusCommandHandler : IRequestHandler<UpdateRiskStatusCommand, bool>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public UpdateRiskStatusCommandHandler(IBeawreContext beawreContext)
+        public UpdateRiskStatusCommandHandler(IDatabaseContext databaseContext)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Task<bool> Handle(UpdateRiskStatusCommand request, CancellationToken cancellationToken)
         {
-            var riskPayloadId = _beawreContext.Relationship.FirstOrDefault(x => x.ToType == ObjectType.RiskPayload && x.FromType == ObjectType.Risk && x.FromId == request.RiskId && !x.IsDeleted)?.ToId;
+            var riskPayloadId = _databaseContext.Relationship.FirstOrDefault(x => x.ToType == ObjectType.RiskPayload && x.FromType == ObjectType.Risk && x.FromId == request.RiskId && !x.IsDeleted)?.ToId;
             if (!riskPayloadId.HasValue) throw new Exception("NO_RISK_FOUND");
 
-            var riskPayload = _beawreContext.RiskPayload.Where(x => x.RootId == riskPayloadId && !x.IsDeleted).OrderByDescending(x => x.Version).FirstOrDefault();
+            var riskPayload = _databaseContext.RiskPayload.Where(x => x.RootId == riskPayloadId && !x.IsDeleted).OrderByDescending(x => x.Version).FirstOrDefault();
             if (riskPayload == null) throw new Exception("NO_RISK_PAYLOAD_FOUND");
 
             var payload = JObject.Parse(riskPayload.Payload ?? "{}");
@@ -38,7 +38,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
             else payload.Add(new JProperty("StatusAdditionalData1", request.AdditionalValue1));
 
             riskPayload.Payload = JsonConvert.SerializeObject(payload);
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(true);
         }

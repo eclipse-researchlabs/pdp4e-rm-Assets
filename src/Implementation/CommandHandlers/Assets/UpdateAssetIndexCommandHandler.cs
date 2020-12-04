@@ -14,16 +14,16 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
 {
     public class UpdateAssetIndexCommandHandler : IRequestHandler<UpdateAssetIndexCommand, bool>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public UpdateAssetIndexCommandHandler(IBeawreContext beawreContext)
+        public UpdateAssetIndexCommandHandler(IDatabaseContext databaseContext)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Task<bool> Handle(UpdateAssetIndexCommand request, CancellationToken cancellationToken)
         {
-            var asset = _beawreContext.Assets.FirstOrDefault(x => x.Id == request.AssetId);
+            var asset = _databaseContext.Assets.FirstOrDefault(x => x.Id == request.AssetId);
             if (asset == null) return Task.FromResult(false);
 
             if (string.IsNullOrEmpty(asset.Payload) || asset.Payload == "null") asset.Payload = "{}";
@@ -40,7 +40,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
             }
 
             asset.Payload = JsonConvert.SerializeObject(payload);
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(true);
         }

@@ -16,12 +16,12 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
 {
     public class CreateRiskCommandHandler : IRequestHandler<CreateRiskCommand, Risk>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
         private IMapper _mapper;
 
-        public CreateRiskCommandHandler(IBeawreContext beawreContext, IMapper mapper)
+        public CreateRiskCommandHandler(IDatabaseContext databaseContext, IMapper mapper)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
             _mapper = mapper;
         }
 
@@ -32,23 +32,23 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
             entity.Payload = JsonConvert.SerializeObject(request.PayloadData);
 
             var riskPayload = new RiskPayload(){ Payload = entity.Payload };
-            _beawreContext.RiskPayload.Add(riskPayload);
-            _beawreContext.SaveChanges();
+            _databaseContext.RiskPayload.Add(riskPayload);
+            _databaseContext.SaveChanges();
 
-            var risk = _beawreContext.Risk.FirstOrDefault(x => x.Name.ToLower() == request.Name.ToLower());
+            var risk = _databaseContext.Risk.FirstOrDefault(x => x.Name.ToLower() == request.Name.ToLower());
             if (risk == null)
             {
                 risk = new Risk(){ Description = request.Description, Name = request.Name };
-                _beawreContext.Risk.Add(risk);
-                _beawreContext.SaveChanges();
+                _databaseContext.Risk.Add(risk);
+                _databaseContext.SaveChanges();
             }
             else
             {
                 risk.Description = request.Description;
-                _beawreContext.SaveChanges();
+                _databaseContext.SaveChanges();
             }
 
-            _beawreContext.Relationship.Add(new Relationship()
+            _databaseContext.Relationship.Add(new Relationship()
             {
                 FromType = ObjectType.Risk, 
                 FromId = risk.RootId, 

@@ -15,16 +15,16 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
 {
     public class UpdateAssetDfdTypeCommandHandler : IRequestHandler<UpdateAssetDfdTypeCommand, bool>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public UpdateAssetDfdTypeCommandHandler(IBeawreContext beawreContext)
+        public UpdateAssetDfdTypeCommandHandler(IDatabaseContext databaseContext)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Task<bool> Handle(UpdateAssetDfdTypeCommand request, CancellationToken cancellationToken)
         {
-            var asset = _beawreContext.Assets.FirstOrDefault(x => x.Id == request.AssetId);
+            var asset = _databaseContext.Assets.FirstOrDefault(x => x.Id == request.AssetId);
             if (asset == null) return Task.FromResult(false);
 
             if (string.IsNullOrEmpty(asset.Payload) || asset.Payload == "null") asset.Payload = "{}";
@@ -43,7 +43,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
             else if (!payload.ContainsKey("Color")) payload.Add(new JProperty("Color", request.Color));
 
             asset.Payload = JsonConvert.SerializeObject(payload);
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(true);
         }

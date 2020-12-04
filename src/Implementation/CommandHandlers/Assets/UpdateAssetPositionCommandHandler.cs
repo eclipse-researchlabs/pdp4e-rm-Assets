@@ -14,17 +14,17 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
 {
     public class UpdateAssetPositionCommandHandler : IRequestHandler<UpdateAssetPositionCommand, bool>
     {
-        private IBeawreContext _beawreContext;
+        private IDatabaseContext _databaseContext;
 
-        public UpdateAssetPositionCommandHandler(IBeawreContext beawreContext)
+        public UpdateAssetPositionCommandHandler(IDatabaseContext databaseContext)
         {
-            _beawreContext = beawreContext;
+            _databaseContext = databaseContext;
         }
 
         public Task<bool> Handle(UpdateAssetPositionCommand request, CancellationToken cancellationToken)
         {
             var relationship =
-                _beawreContext.Relationship.FirstOrDefault(x =>
+                _databaseContext.Relationship.FirstOrDefault(x =>
                     x.FromId == request.ContainerId && x.ToId == request.AssetId);
 
             var payload = JsonConvert.DeserializeObject<AssetPayloadModel>(relationship?.Payload ?? "{}");
@@ -34,7 +34,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Assets
 
             if (relationship == null) return Task.FromResult(false);
             relationship.Payload = JsonConvert.SerializeObject(payload);
-            _beawreContext.SaveChanges();
+            _databaseContext.SaveChanges();
 
             return Task.FromResult(true);
         }
