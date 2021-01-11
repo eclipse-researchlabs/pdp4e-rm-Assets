@@ -1,4 +1,15 @@
-﻿using System;
+﻿// /********************************************************************************
+//  * Copyright (c) 2020,2021 Beawre Digital SL
+//  *
+//  * This program and the accompanying materials are made available under the
+//  * terms of the Eclipse Public License 2.0 which is available at
+//  * http://www.eclipse.org/legal/epl-2.0.
+//  *
+//  * SPDX-License-Identifier: EPL-2.0 3
+//  *
+//  ********************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,8 +28,8 @@ namespace Core.Assets.Implementation.Services
 {
     public class AssetService : IAssetService
     {
-        private IMediator _mediator;
         private IDatabaseContext _databaseContext;
+        private IMediator _mediator;
 
         public AssetService(IMediator mediator, IDatabaseContext databaseContext)
         {
@@ -67,6 +78,7 @@ namespace Core.Assets.Implementation.Services
 
                 item.Payload = JsonConvert.SerializeObject(payload);
             }
+
             _databaseContext.SaveChanges();
         }
 

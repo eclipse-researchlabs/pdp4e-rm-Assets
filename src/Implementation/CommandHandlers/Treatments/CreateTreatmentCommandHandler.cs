@@ -1,4 +1,15 @@
-﻿using System;
+﻿// /********************************************************************************
+//  * Copyright (c) 2020,2021 Beawre Digital SL
+//  *
+//  * This program and the accompanying materials are made available under the
+//  * terms of the Eclipse Public License 2.0 which is available at
+//  * http://www.eclipse.org/legal/epl-2.0.
+//  *
+//  * SPDX-License-Identifier: EPL-2.0 3
+//  *
+//  ********************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,8 +30,8 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
 {
     public class CreateTreatmentCommandHandler : IRequestHandler<CreateTreatmentCommand, TreatmentModel>
     {
-        private IMapper _mapper;
         private IDatabaseContext _databaseContext;
+        private IMapper _mapper;
 
         public CreateTreatmentCommandHandler(IMapper mapper, IDatabaseContext databaseContext)
         {
@@ -40,7 +51,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
                     throw new Exception("FORBIDDEN_KEY");
             }
 
-            var treatmentPayload = new TreatmentPayload() { Payload = JsonConvert.SerializeObject(requestPayload) };
+            var treatmentPayload = new TreatmentPayload() {Payload = JsonConvert.SerializeObject(requestPayload)};
             _databaseContext.TreatmentPayload.Add(treatmentPayload);
             _databaseContext.SaveChanges();
 
@@ -52,7 +63,7 @@ namespace Core.Assets.Implementation.CommandHandlers.Treatments
             var treatment = treatments.Where(x => x.ClosedDescriptionProbability <= 7 && x.Type?.ToLower() == request.Type.ToLower()).OrderByDescending(x => x.ClosedDescriptionProbability).FirstOrDefault();
             if (treatment == null)
             {
-                treatment = new TreatmentModel() { Type = request.Type, Description = request.Description, Name = request.Name };
+                treatment = new TreatmentModel() {Type = request.Type, Description = request.Description, Name = request.Name};
                 _databaseContext.Treatment.Add(treatment);
                 _databaseContext.SaveChanges();
             }

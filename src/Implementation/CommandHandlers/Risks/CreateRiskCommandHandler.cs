@@ -1,4 +1,15 @@
-﻿using System;
+﻿// /********************************************************************************
+//  * Copyright (c) 2020,2021 Beawre Digital SL
+//  *
+//  * This program and the accompanying materials are made available under the
+//  * terms of the Eclipse Public License 2.0 which is available at
+//  * http://www.eclipse.org/legal/epl-2.0.
+//  *
+//  * SPDX-License-Identifier: EPL-2.0 3
+//  *
+//  ********************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,14 +42,14 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
 
             entity.Payload = JsonConvert.SerializeObject(request.PayloadData);
 
-            var riskPayload = new RiskPayload(){ Payload = entity.Payload };
+            var riskPayload = new RiskPayload() {Payload = entity.Payload};
             _databaseContext.RiskPayload.Add(riskPayload);
             _databaseContext.SaveChanges();
 
             var risk = _databaseContext.Risk.FirstOrDefault(x => x.Name.ToLower() == request.Name.ToLower());
             if (risk == null)
             {
-                risk = new Risk(){ Description = request.Description, Name = request.Name };
+                risk = new Risk() {Description = request.Description, Name = request.Name};
                 _databaseContext.Risk.Add(risk);
                 _databaseContext.SaveChanges();
             }
@@ -50,9 +61,9 @@ namespace Core.Assets.Implementation.CommandHandlers.Risks
 
             _databaseContext.Relationship.Add(new Relationship()
             {
-                FromType = ObjectType.Risk, 
-                FromId = risk.RootId, 
-                ToType = ObjectType.RiskPayload, 
+                FromType = ObjectType.Risk,
+                FromId = risk.RootId,
+                ToType = ObjectType.RiskPayload,
                 ToId = riskPayload.RootId
             });
 
